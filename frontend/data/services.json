@@ -1,0 +1,38 @@
+[
+  {
+    "id": "hire",
+    "icon": "lucide:car",
+    "title": "Car Hire",
+    "tagline": "Drive today. Return when you're done.",
+    "body": "Daily, weekly, and monthly rates for individuals and corporates. Choose from our fleet of sedans, SUVs, and vans.",
+    "ctaLabel": "Learn More",
+    "ctaLink": "/services#hire"
+  },
+  {
+    "id": "import",
+    "icon": "lucide:ship",
+    "title": "Vehicle Import",
+    "tagline": "We find it. We clear it. You drive it.",
+    "body": "We source and clear vehicles from Japan, UK, and UAE. We handle inspection, shipping, and registration.",
+    "ctaLabel": "Learn More",
+    "ctaLink": "/services#import"
+  },
+  {
+    "id": "fleet",
+    "icon": "lucide:building-2",
+    "title": "Fleet Management",
+    "tagline": "Corporate vehicles for businesses that keep moving.",
+    "body": "Corporate accounts with dedicated account managers and regular servicing for your business fleet.",
+    "ctaLabel": "Learn More",
+    "ctaLink": "/services#fleet"
+  },
+  {
+    "id": "equipment",
+    "icon": "lucide:wrench",
+    "title": "Equipment Rental",
+    "tagline": "Get the right machine for your project.",
+    "body": "Construction and logistics equipment for projects across Kenya. Generators, forklifts, and more.",
+    "ctaLabel": "Learn More",
+    "ctaLink": "/services#equipment"
+  }
+]
