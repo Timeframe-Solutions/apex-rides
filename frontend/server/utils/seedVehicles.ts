@@ -524,12 +524,16 @@ const seedData: CreateVehiclePayload[] = [
 ]
 
 export const seedVehicles = async () => {
-  const { vehicles } = await readVehicles({ limit: 1 })
+  const vehicles = await readVehiclesRaw()
   if (vehicles.length > 0) return // Already seeded
   
   console.log('Seeding vehicles...')
-  for (const data of seedData) {
-    await createVehicle(data)
-  }
-  console.log('Seeding complete.')
+  const newVehicles: Vehicle[] = seedData.map(data => ({
+    ...data,
+    id: Math.random().toString(36).slice(2, 9),
+    dateAdded: new Date().toISOString()
+  }))
+  
+  await saveVehiclesRaw(newVehicles)
+  console.log(`Seeding complete. ${newVehicles.length} vehicles added.`)
 }

@@ -62,6 +62,20 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    storage: {
+      data: {
+        driver: "memory",
+      },
+    },
+    devStorage: {
+      data: {
+        driver: "fs",
+        base: "./.data/db",
+      },
+    },
+  },
+
   typescript: {
     tsConfig: {
       compilerOptions: {

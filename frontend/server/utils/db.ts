@@ -5,15 +5,12 @@ const getStorage = () => useStorage('data')
 
 export const readVehiclesRaw = async (): Promise<Vehicle[]> => {
   const storage = getStorage()
-  const keys = await storage.getKeys('vehicles')
-  const vehicles: Vehicle[] = []
-  
-  for (const key of keys) {
-    const vehicle = await storage.getItem<Vehicle>(key)
-    if (vehicle) vehicles.push(vehicle)
-  }
-  
-  return vehicles
+  return (await storage.getItem<Vehicle[]>('vehicles:all')) || []
+}
+
+export const saveVehiclesRaw = async (vehicles: Vehicle[]): Promise<void> => {
+  const storage = getStorage()
+  await storage.setItem('vehicles:all', vehicles)
 }
 
 export const readVehicles = async (params: Partial<VehicleFilter> & { limit?: number, featured?: boolean }) => {
@@ -66,45 +63,58 @@ export const readVehicleBySlug = async (slug: string): Promise<Vehicle | null> =
 }
 
 export const readVehicleById = async (id: string): Promise<Vehicle | null> => {
-  const storage = getStorage()
-  return await storage.getItem<Vehicle>(`vehicles:${id}`)
+  const vehicles = await readVehiclesRaw()
+  return vehicles.find(v => v.id === id) || null
 }
 
 export const createVehicle = async (data: CreateVehiclePayload) => {
-  const storage = getStorage()
+  const vehicles = await readVehiclesRaw()
   const id = Math.random().toString(36).slice(2, 9)
   const newVehicle: Vehicle = {
     ...data,
     id,
     dateAdded: new Date().toISOString()
   }
-  await storage.setItem(`vehicles:${id}`, newVehicle)
+  vehicles.push(newVehicle)
+  await saveVehiclesRaw(vehicles)
   return newVehicle
 }
 
 export const updateVehicle = async (id: string, data: UpdateVehiclePayload) => {
-  const storage = getStorage()
-  const existing = await storage.getItem<Vehicle>(`vehicles:${id}`)
-  if (!existing) return undefined
+  const vehicles = await readVehiclesRaw()
+  const index = vehicles.findIndex(v => v.id === id)
+  if (index === -1) return undefined
   
   const updatedVehicle: Vehicle = { 
-    ...existing, 
+    ...vehicles[index], 
     ...data,
     id // Ensure ID remains unchanged
   } as Vehicle
   
-  await storage.setItem(`vehicles:${id}`, updatedVehicle)
+  vehicles[index] = updatedVehicle
+  await saveVehiclesRaw(vehicles)
   return updatedVehicle
 }
 
 export const deleteVehicle = async (id: string) => {
-  const storage = getStorage()
-  await storage.removeItem(`vehicles:${id}`)
+  const vehicles = await readVehiclesRaw()
+  const filtered = vehicles.filter(v => v.id !== id)
+  await saveVehiclesRaw(filtered)
 }
 
 // Inquiries persistence
-export const createInquiry = async (data: InquiryPayload) => {
+export const readInquiries = async (): Promise<Inquiry[]> => {
   const storage = getStorage()
+  return (await storage.getItem<Inquiry[]>('inquiries:all')) || []
+}
+
+export const saveInquiries = async (items: Inquiry[]): Promise<void> => {
+  const storage = getStorage()
+  await storage.setItem('inquiries:all', items)
+}
+
+export const createInquiry = async (data: InquiryPayload) => {
+  const items = await readInquiries()
   const id = Math.random().toString(36).slice(2, 9)
   const newInquiry: Inquiry = {
     ...data,
@@ -113,33 +123,24 @@ export const createInquiry = async (data: InquiryPayload) => {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
-  await storage.setItem(`inquiries:${id}`, newInquiry)
+  items.push(newInquiry)
+  await saveInquiries(items)
   return newInquiry
 }
 
-export const readInquiries = async () => {
-  const storage = getStorage()
-  const keys = await storage.getKeys('inquiries')
-  const items: Inquiry[] = []
-  for (const key of keys) {
-    const item = await storage.getItem<Inquiry>(key)
-    if (item) items.push(item)
-  }
-  return items.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-}
-
 export const updateInquiry = async (id: string, data: UpdateInquiryPayload) => {
-  const storage = getStorage()
-  const existing = await storage.getItem<Inquiry>(`inquiries:${id}`)
-  if (!existing) return undefined
+  const items = await readInquiries()
+  const index = items.findIndex(i => i.id === id)
+  if (index === -1) return undefined
   
   const updatedInquiry: Inquiry = { 
-    ...existing, 
+    ...items[index], 
     ...data, 
     id, 
     updatedAt: new Date().toISOString() 
   } as Inquiry
   
-  await storage.setItem(`inquiries:${id}`, updatedInquiry)
+  items[index] = updatedInquiry
+  await saveInquiries(items)
   return updatedInquiry
 }
